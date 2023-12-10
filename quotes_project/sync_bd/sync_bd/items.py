@@ -4,9 +4,17 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import scrapy
+from scrapy_djangoitem import DjangoItem
+from quotes_project.quotes_app.models import Authors, Quotes, Tags
 
 
-class SyncBdItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+class Author(DjangoItem):
+    django_model = Authors
+
+
+class Quote(DjangoItem):
+    django_model = Quotes
+
+
+class Tag(DjangoItem):
+    django_model = Tags
