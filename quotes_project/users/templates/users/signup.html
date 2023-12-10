@@ -1,0 +1,17 @@
+{% extends "quotes_app/base.html" %}
+
+{% block content %}
+<div class="container col-md-3 mx-auto">
+    <div class="text-center">
+        <h2>Signup</h2>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

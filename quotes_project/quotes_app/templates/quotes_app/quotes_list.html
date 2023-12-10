@@ -1,0 +1,59 @@
+{% extends "quotes_app/base.html" %}
+
+{% block content %}
+<div class="container d-flex justify-content-between">
+    <div class="list-group ms-2">
+        {% for quote in quotes %}
+        <div class="list-group-item mb-3 border rounded d-flex flex-column">
+            <span class="m-1 h5 fw-normal"><i>{{ quote }}</i></span>
+            <span class="m-1">by <b class="text-primary text-opacity-75">{{ quote.author }}</b>
+                <a href="{% url 'quotes_app:author' quote.author %}"
+            class="link-underline link-primary link-underline-opacity-0 text-opacity-75">(about)</a></span>
+            <div class="m-1">Tags:
+                {% for tag_name in tags %}
+                {% if tag_name.quote == quote %}
+                <a class="link-underline link-primary link-underline-opacity-0 text-white bg-primary bg-opacity-50 rounded p-1"
+                   href="{% url 'quotes_app:tag' tag_name %}" style="font-size:14px;">{{ tag_name }}</a>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link{% if not quotes.has_previous %} disabled{% else %} text-primary text-opacity-75{% endif %}"
+                       href="{% if quotes.has_previous %}?page={{ quotes.previous_page_number }}{% endif %}">
+                        Previous
+                    </a>
+                </li>
+                {% for page in quotes.paginator %}
+                <li class="page-item{% if page.number == quotes.number %} active{% endif %}">
+                    <a class="page-link{% if page.number == quotes.number %} bg-primary bg-opacity-50 border-primary border-opacity-25{% else %} text-primary text-opacity-75{% endif %}"
+                       {% if page.number != quotes.number %}href="?page={{ page.number }}" {% endif %}>
+                        {{ page.number }}
+                    </a>
+                </li>
+                {% endfor %}
+                <li class="page-item">
+                    <a class="page-link{% if not quotes.has_next %} disabled{% else %} text-primary text-opacity-75{% endif %}"
+                       href="{% if quotes.has_next %}?page={{ quotes.next_page_number }}{% endif %}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <aside class="mx-5">
+        <h2 style="white-space: nowrap;">Top Ten tags</h2>
+        <ul>
+            {% for tag in tags_font|slice:":10" %}
+            <li class="d-flex flex-row-reverse">
+                <a class="link-underline link-primary link-underline-opacity-0 text-white bg-primary bg-opacity-50 rounded p-1 m-1"
+                   href="{% url 'quotes_app:tag' tag.name %}" style="font-size:{{ tag.font }}px;">
+                    {{ tag.name }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </aside>
+</div>
+{% endblock %}

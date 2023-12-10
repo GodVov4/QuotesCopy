@@ -1,0 +1,14 @@
+{% extends "quotes_app/base.html" %}
+
+{% block content %}
+<div class="container p-4">
+    <h3>{{ author }}</h3>
+    <p>
+        <b>Born: </b>
+        <span>{{ author.born_date }}</span>
+        <span>{{ author.born_location }}</span>
+    </p>
+    <p><b>Description:</b></p>
+    <div>{{ author.description }}</div>
+</div>
+{% endblock %}
