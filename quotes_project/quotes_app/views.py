@@ -1,7 +1,9 @@
+import requests
+from bs4 import BeautifulSoup
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Count, F
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import View, DetailView, CreateView
@@ -31,14 +33,14 @@ class BaseListView(View):
 
 
 class QuoteListView(BaseListView):
-    quotes = Quotes.objects.all()
+    quotes = Quotes.objects.all().order_by('id')
 
 
 class FilterListView(BaseListView):
     quotes = None
 
     def get(self, request, tag=None, *args, **kwargs):
-        self.quotes = Quotes.objects.filter(tags__name=tag).distinct()
+        self.quotes = Quotes.objects.filter(tags__name=tag).distinct().order_by('id')
         return super().get(request, *args, **kwargs)
 
 
@@ -72,7 +74,3 @@ class AddTagView(CreateView):
     template_name = 'quotes_app/add_tag.html'
     form_class = TagForm
     success_url = reverse_lazy('quotes_app:main')
-
-
-class SyncView(View):
-    pass
