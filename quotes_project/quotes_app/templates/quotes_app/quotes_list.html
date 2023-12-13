@@ -3,6 +3,12 @@
 {% block content %}
 <div class="container d-flex justify-content-between">
     <div class="list-group ms-2">
+        {% if not quotes %}
+        <div class="list-group-item mb-3 border rounded d-flex flex-column">
+            Press "Sync" to synchronize data (only for registered users)
+            P.S It may take a few minutes to download, just reload page
+        </div>
+        {% endif %}
         {% for quote in quotes %}
         <div class="list-group-item mb-3 border rounded d-flex flex-column">
             <span class="m-1 h5 fw-normal"><i>{{ quote }}</i></span>
@@ -10,11 +16,9 @@
                 <a href="{% url 'quotes_app:author' quote.author %}"
             class="link-underline link-primary link-underline-opacity-0 text-opacity-75">(about)</a></span>
             <div class="m-1">Tags:
-                {% for tag_name in tags %}
-                {% if tag_name.quote == quote %}
+                {% for tag_name in quote.tags.all %}
                 <a class="link-underline link-primary link-underline-opacity-0 text-white bg-primary bg-opacity-50 rounded p-1"
                    href="{% url 'quotes_app:tag' tag_name %}" style="font-size:14px;">{{ tag_name }}</a>
-                {% endif %}
                 {% endfor %}
             </div>
         </div>

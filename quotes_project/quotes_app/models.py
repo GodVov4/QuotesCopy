@@ -1,14 +1,14 @@
-from django.db.models import Model, CharField, DateField, ForeignKey, CASCADE, DO_NOTHING
+from django.db.models import Model, CharField, ForeignKey, CASCADE, ManyToManyField
 
 
 class Authors(Model):
     fullname = CharField(max_length=120)
-    born_date = DateField()
+    born_date = CharField(max_length=80)
     born_location = CharField(max_length=200)
     description = CharField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'authors'
 
     def __str__(self):
@@ -18,9 +18,10 @@ class Authors(Model):
 class Quotes(Model):
     author = ForeignKey(Authors, CASCADE, db_column='author')
     quote = CharField()
+    tags = ManyToManyField('Tags', 'quotes')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'quotes'
 
     def __str__(self):
@@ -29,10 +30,9 @@ class Quotes(Model):
 
 class Tags(Model):
     name = CharField(max_length=50)
-    quote = ForeignKey(Quotes, DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'tags'
 
     def __str__(self):

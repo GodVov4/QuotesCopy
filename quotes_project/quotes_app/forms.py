@@ -1,4 +1,5 @@
-from django.forms import ModelForm, CharField, TextInput, Textarea, DateField, DateInput, CheckboxSelectMultiple, Select, ModelChoiceField
+from django.forms import ModelForm, CharField, TextInput, Textarea, DateField, DateInput, CheckboxSelectMultiple, \
+    Select, ModelChoiceField, ModelMultipleChoiceField, SelectMultiple
 
 from .models import Authors, Quotes, Tags
 
@@ -20,17 +21,45 @@ class AuthorForm(ModelForm):
 
 class QuoteForm(ModelForm):
     quote = CharField(widget=Textarea(attrs={"class": "form-control"}))
-    author = ModelChoiceField(queryset=Authors.objects.all(), widget=Select(attrs={"class": "form-select"}))
+    author = ModelChoiceField(Authors.objects.all(), widget=Select(attrs={"class": "form-select"}))
+    tags = ModelMultipleChoiceField(Tags.objects.all(), widget=SelectMultiple(attrs={"class": "form-select"}),
+                                    required=False)
 
     class Meta:
         model = Quotes
-        fields = ('quote', 'author')
+        fields = ('quote', 'author', 'tags')
 
 
-class TagForm(ModelForm):
+class CreateTagForm(ModelForm):
     name = CharField(max_length=50, widget=TextInput(attrs={"class": "form-control"}))
-    quote = ModelChoiceField(queryset=Quotes.objects.all(), widget=Select(attrs={"class": "form-select"}))
 
     class Meta:
         model = Tags
-        fields = ('name', 'quote')
+        fields = ('name',)
+
+    def save(self, commit=True):
+        tag_name = self.cleaned_data['name']
+        tag, created = Tags.objects.get_or_create(name=tag_name)
+        if commit:
+            tag.save()
+        return tag
+
+
+class BindTagForm(ModelForm):
+    quote = ModelChoiceField(Quotes.objects.all(), widget=Select(attrs={"class": "form-select"}), required=True)
+    tags = ModelMultipleChoiceField(Tags.objects.all(), widget=SelectMultiple(attrs={"class": "form-select"}),
+                                    required=True)
+
+    class Meta:
+        model = Tags
+        fields = ('quote', 'tags')
+
+    def save(self, commit=True):
+        quote_instance = self.cleaned_data['quote']
+        tags_instances = self.cleaned_data['tags']
+        for tag_instance in tags_instances:
+            if tag_instance not in quote_instance.tags.all():
+                quote_instance.tags.add(tag_instance)
+        if commit:
+            quote_instance.save()
+        return quote_instance

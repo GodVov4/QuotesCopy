@@ -8,8 +8,9 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import View, DetailView, CreateView
 
-from .forms import AuthorForm, QuoteForm, TagForm
+from .forms import AuthorForm, QuoteForm, CreateTagForm, BindTagForm
 from .models import Quotes, Authors, Tags
+from .tasks import task
 
 
 class BaseListView(View):
@@ -18,7 +19,7 @@ class BaseListView(View):
 
     def get(self, request, *args, **kwargs):
         tags = Tags.objects.all()
-        tags_font = Tags.objects.values('name').annotate(quote_count=Count('quote')).order_by('-quote_count', 'name')
+        tags_font = Tags.objects.values('name').annotate(quote_count=Count('quotes')).order_by('-quote_count', 'name')
         tags_font = tags_font.annotate(font=F('quote_count') * 2)
         paginator = Paginator(self.quotes, self.paginate_by)
         page = request.GET.get('page', 1)
@@ -72,5 +73,18 @@ class AddQuoteView(CreateView):
 class AddTagView(CreateView):
     model = Tags
     template_name = 'quotes_app/add_tag.html'
-    form_class = TagForm
+    form_class = CreateTagForm
     success_url = reverse_lazy('quotes_app:main')
+
+
+@method_decorator(login_required, name='dispatch')
+class BindTagView(CreateView):
+    model = Tags
+    template_name = 'quotes_app/bind_tags.html'
+    form_class = BindTagForm
+    success_url = reverse_lazy('quotes_app:main')
+
+
+def sync(request):
+    task.delay()
+    return redirect('quotes_app:main')
