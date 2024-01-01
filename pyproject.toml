@@ -13,6 +13,7 @@ celery = "5.3.6"
 redis = "5.0.1"
 beautifulsoup4 = "4.12.2"
 requests = "2.31.0"
+django-environ = "0.11.2"
 
 
 [build-system]
